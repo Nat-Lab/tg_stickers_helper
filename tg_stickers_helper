@@ -1,0 +1,31 @@
+#!/bin/bash
+# tg_stickers_helper: Mass Sticker Add
+# usage: 
+# ./tg_stickers_helper < stickers.json
+# json structure:
+# {png: "/path/to/png", emoji: "emoji"}
+# {png: "/path/to/png", emoji: "emoji"}
+# ...
+
+tgcli_port=9000
+tgcli_server="127.0.0.1"
+
+exec 3<>/dev/tcp/$tgcli_server/$tgcli_port
+
+function cli_exec {
+	echo "$*" >&3
+	head -n2 <&3 | tail -n1
+}
+
+# No idea why, but required. 
+cli_exec "dialog_list" > /dev/null
+cli_exec "contact_list" > /dev/null
+
+while read -r line
+do
+	png="$(jq '.png' <<< "$line")"
+	emo="$(jq '.emoji' <<< "$line")"
+	echo "Processing $png..."
+	cli_exec "send_document @Stickers $png"
+	cli_exec "msg @Stickers $emoji"
+done
