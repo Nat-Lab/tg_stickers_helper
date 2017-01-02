@@ -27,5 +27,5 @@ do
 	emo="$(jq '.emoji' <<< "$line")"
 	echo "Processing $png..."
 	cli_exec "send_document @Stickers $png"
-	cli_exec "msg @Stickers $emoji"
+	cli_exec "msg @Stickers $emo"
 done
